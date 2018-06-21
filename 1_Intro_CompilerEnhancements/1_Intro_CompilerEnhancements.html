@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Modern C++ at GBTS</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" href="../reveal.js-3.6.0/css/reveal.css">
+		<link rel="stylesheet" href="../reveal.js-3.6.0/css/theme/dark.css" id="theme">
+		<link rel="stylesheet" href="../reveal.js-3.6.0/lib/css/zendark.css">
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<!-- Modern C++ at GBTS: -->
+				<section>
+					<h2>Modern C++ at GBTS: <br>
+						Standard Practices from Standard Library</h2>
+				    <br>
+					<h3 id="c1">1. Course Introduction and Compiler Enhancements</h3>
+					<br>
+					<p>
+						<small>Stefano Lusardi, Software Developer</small>
+					</p>
+				</section>
+				<!-- Course introduction -->
+				<section>
+					<h3>Course introduction</h3>
+					<br>
+					<p><ul>
+						<li>Self contained modules: no dependencies</li>
+						<li>Practical focus: Code samples</li>
+						<li>C++ devs: share, update, get in touch</li>
+						<li>Non-C++ devs: insights and feature discovery</li>
+					</ul></p>
+				</section>
+				<!-- Modern C++ Practices -->
+				<section>				
+					<h3>Modern C++ Practices</h3>
+					<br>
+					<p align="left">
+						<span id="c1">Modern: </span>C++11 Standard and beyond
+						<br>
+						<span id="c1">Practices: </span>readable, expressive, solid, reusable pieces of code
+					</p>
+					<p><ul>
+						<li>expressive: self-explicative </li>
+						<li>solid: widely tested</li>
+						<li>reusable: D.R.Y. (Don't Repeat Yourself)</li>
+					</ul></p>
+					<br>
+					e.g.: std::count. Holds all the 3 principles
+				</section>
+				<!-- Standards -->
+				<section>		
+					<h3>Standards</h3>	
+					<br>					
+					<section>
+					<br>
+						<p><ul>
+							<p>
+								<li>What is a standard (library)?</li>
+								<span id="c1"> Containers, Iterators, Algorithms</span>
+							</p>
+							<p>
+								<li>Why do we need to have new standards?</li>
+								<span id="c1"> General purpose</span>
+							</p>
+						</ul></p>
+						<p>We will discuss only <span id="c1">STL</span> although Boost, Qt and others third party provides even wider set of features</p>
+					</section>
+					
+					<section>
+					<br>
+						<p>The simplest example: loop comparison</p>
+						<br>
+						<p>Non-standard vs. standard implementation in practice</p>
+						<br>
+						<p>Remember that we are looking for:
+							<ul>
+								<li><span id="c1">Expressivity: </span>clear meaning, easy to understand</li>
+								<li><span id="c1">Testability: </span>easy to test, or better, already tested</li>
+								<li><span id="c1">Reusability: </span>have room for new features on top</li>
+							</ul>
+						</p>
+					</section>
+					
+					<section>
+					<br>
+						<p>Example: <span id="c1">"Old school"</span> for loop</p>						
+						<p><pre><code class="cpp" data-trim contenteditable>
+int c = 0;
+for (int i = 0; i &lt; myVec.size(); ++i) 
+{
+    int val = myVec[i];
+    if (val == 5) 
+    {
+        ++c;
+    }
+}						
+						</code></pre></p>
+						<br>
+					<p>How many times have you seen something like this (but ten times more complex)?</p>
+					<p>To fully understand this snippet you need at least to read it once entirely</p>
+					</section>
+					
+					<section>
+					<br>
+						<p>Example: <span id="c1">"New school"</span> standard algorithm</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+int c = std::count(begin(myVec), end(myVec), 5);
+						</code></pre></p>
+						<br>
+						<p>Isn't it clearer, shorter, more expressive and bullet proof?</p>
+						<p><small>You can understand its meaning even without read it entirely!</small></p>
+					</section>
+						
+				</section>				
+			</div>
+		</div>
+
+		<script src="../reveal.js-3.6.0/lib/js/head.min.js"></script>
+		<script src="../reveal.js-3.6.0/js/reveal.js"></script>
+
+		<script>
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+				transition: 'slide', 
+				dependencies: [
+					{ src: '../reveal.js-3.6.0/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: '../reveal.js-3.6.0/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '../reveal.js-3.6.0/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '../reveal.js-3.6.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: '../reveal.js-3.6.0/plugin/search/search.js', async: true },
+					{ src: '../reveal.js-3.6.0/plugin/zoom-js/zoom.js', async: true },
+					{ src: '../reveal.js-3.6.0/plugin/notes/notes.js', async: true }
+				]
+			});
+		</script>
+
+	</body>
+</html>
