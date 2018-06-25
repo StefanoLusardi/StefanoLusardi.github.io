@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Modern C++</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" href="../reveal.js-3.6.0/css/reveal.css">
+		<link rel="stylesheet" href="../reveal.js-3.6.0/css/theme/dark.css" id="theme">
+		<link rel="stylesheet" href="../reveal.js-3.6.0/lib/css/zendark.css">
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<!-- Modern C++ -->
+				<section>
+					<h2>Modern C++ <br>
+						Standard Practices from Standard Library</h2>
+				    <br>
+					<h3 id="c1">2. Move Semantics and Smart Pointers</h3>
+					<br>
+					<p>
+						<small>Stefano Lusardi, Software Developer</small>
+					</p>
+				</section>				
+				
+				<!-- Thank you! -->
+				<section>	
+					<h3>Thank you!</h3>
+				</section>	
+				
+				<!-- What's next? -->
+				<section>	
+					<h3>What's next?</h3>
+					<br>
+					<h4>STL Algorithms and Lambda Expressions</h4>
+				</section>	
+				
+				<!-- Questions? -->
+				<section>	
+					<h3>Questions?</h3>
+				</section>	
+				
+				</section>
+			</div>
+		</div>
+
+		<script src="../reveal.js-3.6.0/lib/js/head.min.js"></script>
+		<script src="../reveal.js-3.6.0/js/reveal.js"></script>
+
+		<script>
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+				transition: 'slide', 
+				dependencies: [
+					{ src: '../reveal.js-3.6.0/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: '../reveal.js-3.6.0/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '../reveal.js-3.6.0/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '../reveal.js-3.6.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: '../reveal.js-3.6.0/plugin/search/search.js', async: true },
+					{ src: '../reveal.js-3.6.0/plugin/zoom-js/zoom.js', async: true },
+					{ src: '../reveal.js-3.6.0/plugin/notes/notes.js', async: true }
+				]
+			});
+		</script>
+
+	</body>
+</html>
