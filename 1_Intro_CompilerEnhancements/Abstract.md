@@ -1,8 +1,3 @@
-#Modern C++ at GBTS: Standard Practices from Standard Library
-
-#1. Intro and Compiler Enhancements
-
-Abstract:
 This is the first part of a series of talks on the level of professional C++ programmers. 
 The overarching theme is sharing ideas and considerations on modern C++ practices, with minimal, self-contained examples.
 Modern here means C++11 and beyond, and whenever the latest C++17 standard provides substantial enhancements they will be underlined. 
