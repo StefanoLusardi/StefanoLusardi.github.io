@@ -1,2 +1,1 @@
-# StefanoLusardi.github.io
-Modern C++ at GBTS
+# Modern C++: Standard practices from Standard library #
