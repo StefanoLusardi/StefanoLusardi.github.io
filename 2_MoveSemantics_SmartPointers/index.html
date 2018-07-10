@@ -23,6 +23,199 @@
 					</p>
 				</section>				
 				
+				<!-- Ownership -->
+				<section>	
+					<h3>Ownership</h3>
+					<section>
+						<p>The owner is responsible for a given resource management.</p>
+						<small>The main problem arises on memory deallocation.</small>
+						<br>
+						<p>
+							<span id="c1">Golden rule: </span>
+							<br>
+							Don't allocate things on the Heap if you don't have to.
+						</p>	
+					</section>
+					
+					<section>						
+						<p> 
+							Always prefer <span id="c1">*</span>Stack allocations with respect to 
+							<span id="c1">**</span>Heap allocations.
+						</p>
+						<p>
+							<span id="c1">*</span>Object deallocation occurs going out of scope.
+							You do not need to take care of that.
+							<br>
+							<span id="c1">**</span>Object deallocation needs to be handled in some ways.
+							You do must take care of that.
+						</p>
+					</section>
+					
+					<section>
+						<p>Stack vs. Heap example</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+	Foo foo; // Stack allocation. No need for manual cleanup.
+
+	Foo* foo = new Foo(); // Heap allocation. Needs to be deleted at some point.
+	...
+	delete foo; // Delete operation is required to avoid a Memory Leak
+						</code></pre></p>
+					</section>
+					
+					<section>	
+						<p>
+							So, why do we need Heap allocations?
+							<br>
+							Polymorphism and much more.
+						</p>
+						<p><pre><code class="cpp" data-trim contenteditable>
+class Shape { virtual ~Shape() = default;};
+class Circle : public Shape { };
+class Square : public Shape { };
+
+Shape* circle = new Circle();
+Shape* square = new Square();
+						</code></pre></p>
+						<small>At some point you must delete circle and square objects in order to avoid memory leaks.</small>
+					</section>	
+					
+					<section>	
+						<p>A real case scenario</p>
+						<p><pre><code class="cpp" data-trim contenteditable>						
+ShapeManager* manager = new ShapeManager();
+Point2d* pointA  = manager->CreatePoint2d(0, 0);
+Point2d* pointB  = manager->CreatePoint2d(1, 1);
+Segment* segment = manager->CreateSegment(pointA, pointB);					
+// ... delete?
+						</code></pre></p>
+					</section>
+					
+					<section>	
+						<p>
+							Note that the ownership is not clear at all:
+							<br>
+							You must read each class implementation to understand the objects hierarchy.
+						</p>						
+						<p>
+							Who owns who?
+							<p><ul>
+								<li>Can we just suppose a parent-child relationship? 
+									<br>(e.g. manager owns segment, segment owns pointA and pointB)</li>
+								<li>Or a global manager ownership? (manager owns everything)</li>
+								<li>Or not even ownership at all? (no one owns anything)</li>
+								<li>And of course pay attention not to delete an object two times.
+									<br>Note that even the order of delete operations matters.</li>
+							</ul></p>
+							Resource management is not trivial.			
+						</p>					
+					</section>	
+
+					<section>	
+						<p>
+							So, why do we care?
+						</p>
+						Readability, Testability, Expressivity.
+						<p>
+							Does the modern standards provide any utility for (smart) resource management?		
+						</p>					
+					</section>	
+					
+				</section>
+				
+				<!-- Smart Pointers -->
+				<section>	
+					<h3>Smart Pointers</h3>
+					<section>
+						<p><ul>
+							<li>std::unique_ptr&lt;T&gt; </li>
+							<li>std::shared_ptr&lt;T&gt; </li>
+							<li>std::weak_ptr&lt;T&gt; </li>
+						</ul></p>
+					</section>
+					
+					<section>	
+						<p>
+						</p>
+						std::unique_ptr: this thing is only mine. I will "delete" it (= out of scope), or I can make you its new owner (= std::move).	
+					</section>
+					
+					<section>	
+						<p>
+						</p>
+						std::shared_ptr: use_cont and ref_count. What are they? Python code insight (every thing is ref-counted).
+					</section>
+					
+					<section>	
+						<p>
+						</p>
+						std::weak_ptr: now you can safely hold a pointer to the parent object in a tree-like structure
+					</section>
+					
+				</section>					
+				
+				<section>	
+					<h3>Smart Pointers</h3>
+					<section>
+						<p>
+						</p>
+						Shall I pass by reference? Yes.
+					</section>
+					
+					<section>
+						<p>
+						</p>
+						Shall I get the pointer? No. (real world stories tell us that sometimes we actually must do that, e.g. QObject::connect)
+					</section>
+					
+					<section>
+						<p>
+						</p>
+						Helper functions make_unique, make_shared, can't access you private ctors. Use explicit initialization.
+					</section>
+					
+					<section>
+						<p>
+						</p>
+						Beware of other frameworks "stealing" policies (e.g. QVector, ahrrrr).
+					</section>
+					
+					<section>
+						<p>
+						</p>
+						Double deletion is still a thing, and a guaranteed crash.
+					</section>
+					
+				</section>
+				
+				<!-- Move Semantics -->
+				<section>
+					<h3>Move Semantics</h3>
+					<section>	
+						<p>
+						</p>
+						How does it look like (&&) vs what it really is  (static_cast).
+					</section>
+					
+					<section>	
+						<p><i>lvalue</i>&ensp; vs. &ensp;<i>rvalue</i></p>
+					</section>
+					
+					<section>	
+						<p>
+						</p>
+						"It's going to die anyway" state of mind.
+					</section>
+					
+					<section>	
+						<p>
+						</p>
+						Please declare non-const move argument for assignment operations.
+						An example on move constructor implementation.
+					</section>
+					
+				</section>
+				
 				<!-- Thank you! -->
 				<section>	
 					<h3>Thank you!</h3>
