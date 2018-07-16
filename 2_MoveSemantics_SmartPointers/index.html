@@ -11,6 +11,7 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
+			
 				<!-- Modern C++ -->
 				<section>
 					<h2>Modern C++ <br>
@@ -21,13 +22,23 @@
 					<p>
 						<small>Stefano Lusardi, Software Developer</small>
 					</p>
-				</section>				
+				</section>		
+
+				<!-- Agenda -->
+				<section>
+					<h3 id="c1">Agenda</h3>
+					<br>
+					<p><ul>						
+						<li>Smart Pointers ( Ownership ) </li>						
+						<li>Move Semantics ( <i>lvalue</i> vs. <i>rvalue</i> ) </li>
+					</ul></p>
+				</section>					
 				
 				<!-- Ownership -->
 				<section>	
 					<h3>Ownership</h3>
 					<section>
-						<p>The owner is responsible for a given resource management.</p>
+						<p>The owner is responsible for the management of a given resource.</p>
 						<small>The main problem arises on memory deallocation.</small>
 						<br>
 						<p>
@@ -43,10 +54,13 @@
 							<span id="c1">**</span>Heap allocations.
 						</p>
 						<p>
-							<span id="c1">*</span>Object deallocation occurs going out of scope.
-							You do not need to take care of that.
+							<span id="c1">*</span>Automatic object deallocation occurs going out of scope.
 							<br>
+							You do not need to take care of that.
+						</p>
+						<p>
 							<span id="c1">**</span>Object deallocation needs to be handled in some ways.
+							<br>
 							You do must take care of that.
 						</p>
 					</section>
@@ -55,11 +69,15 @@
 						<p>Stack vs. Heap example</p>
 						<br>
 						<p><pre><code class="cpp" data-trim contenteditable>
-	Foo foo; // Stack allocation. No need for manual cleanup.
+Foo foo; 
+// Stack allocation. No need for manual cleanup.
 
-	Foo* foo = new Foo(); // Heap allocation. Needs to be deleted at some point.
-	...
-	delete foo; // Delete operation is required to avoid a Memory Leak
+
+Foo* foo = new Foo(); 
+// Heap allocation. Needs to be deleted at some point.
+...
+delete foo; 
+// Delete operation is required to avoid a Memory Leak
 						</code></pre></p>
 					</section>
 					
@@ -71,44 +89,56 @@
 						</p>
 						<p><pre><code class="cpp" data-trim contenteditable>
 class Shape { virtual ~Shape() = default;};
-class Circle : public Shape { };
-class Square : public Shape { };
+class Circle : public Shape { /* ... */ };
+class Square : public Shape { /* ... */ };
 
 Shape* circle = new Circle();
 Shape* square = new Square();
+// ... 
+delete circle;
+delete square;
 						</code></pre></p>
-						<small>At some point you must delete circle and square objects in order to avoid memory leaks.</small>
+						<small>At some point you must delete explicitly both circle and square objects in order to avoid memory leaks.</small>
+						<br>
+						<small>We can safely assume that calling delete on both circle and square objects is our duty.</small>
 					</section>	
 					
 					<section>	
 						<p>A real case scenario</p>
+						<br>
+						Unfortunately things in the real life looks always more complicated:
+						<br>
 						<p><pre><code class="cpp" data-trim contenteditable>						
 ShapeManager* manager = new ShapeManager();
 Point2d* pointA  = manager->CreatePoint2d(0, 0);
 Point2d* pointB  = manager->CreatePoint2d(1, 1);
-Segment* segment = manager->CreateSegment(pointA, pointB);					
+Segment* segment = manager->CreateSegment(pointA, pointB);
 // ... delete?
 						</code></pre></p>
+						<small>Who is in charge to call delete on these Heap-allocated objects?</small>
 					</section>
 					
 					<section>	
 						<p>
-							Note that the ownership is not clear at all:
+							Note that the ownership hierarchy on the previous example is not clear at all:
 							<br>
 							You must read each class implementation to understand the objects hierarchy.
-						</p>						
+						</p>	
+						<br>
+						Resource management is not trivial.
+					</section>	
+					
+					<section>
 						<p>
-							Who owns who?
-							<p><ul>
+							<ul>
 								<li>Can we just suppose a parent-child relationship? 
 									<br>(e.g. manager owns segment, segment owns pointA and pointB)</li>
 								<li>Or a global manager ownership? (manager owns everything)</li>
 								<li>Or not even ownership at all? (no one owns anything)</li>
 								<li>And of course pay attention not to delete an object two times.
 									<br>Note that even the order of delete operations matters.</li>
-							</ul></p>
-							Resource management is not trivial.			
-						</p>					
+							</ul>
+						</p>		
 					</section>	
 
 					<section>	
@@ -116,9 +146,12 @@ Segment* segment = manager->CreateSegment(pointA, pointB);
 							So, why do we care?
 						</p>
 						Readability, Testability, Expressivity.
+						<br>
+						<small>... and of course bugs and crashes!</small>
 						<p>
 							Does the modern standards provide any utility for (smart) resource management?		
-						</p>					
+						</p>	
+						Smart Pointers is the way to go.
 					</section>	
 					
 				</section>
@@ -127,63 +160,165 @@ Segment* segment = manager->CreateSegment(pointA, pointB);
 				<section>	
 					<h3>Smart Pointers</h3>
 					<section>
+					From C++11 the standard library provides 3 different utility classes that helps dealing with memory management:
 						<p><ul>
-							<li>std::unique_ptr&lt;T&gt; </li>
-							<li>std::shared_ptr&lt;T&gt; </li>
-							<li>std::weak_ptr&lt;T&gt; </li>
+							<li><span id="c1">std::unique_ptr&lt;T&gt; <span></li>
+							<li><span id="c1">std::shared_ptr&lt;T&gt; <span></li>
+							<li><span id="c1">std::weak_ptr&lt;T&gt; <span></li>
 						</ul></p>
 					</section>
 					
-					<section>	
-						<p>
-						</p>
-						std::unique_ptr: this thing is only mine. I will "delete" it (= out of scope), or I can make you its new owner (= std::move).	
+					<section>					
+						<p>The common idea is that each class provides a wrapper around a pointer to a class T.</p>
+						<p>All the "Smart Pointer" classes mimic the behavior of a "Raw Pointer" (also providing same syntax)</p>	
+						<p>A great fatures is the so-called "Reference counting" mechanism that allows to
+						automatically deallocate the pointer as soon as the its last reference gets deleted.</p>
 					</section>
 					
 					<section>	
-						<p>
-						</p>
-						std::shared_ptr: use_cont and ref_count. What are they? Python code insight (every thing is ref-counted).
+						<p>Reference Counting</p>
+						<p>Roughly speaking it is the number of instances that have a reference to the same object</p>	
+						<p>It is safe to assume that is possible to delete an object when it is no more referenced by any other objects 
+						(i.e. it reference count is zero)</p>
+						<p>This technique is commonly used in managed languages such as Python, Java and C# 
+						in which the memory management is not directly handled by the programmer.</p>
+						<p></p>
 					</section>
 					
 					<section>	
-						<p>
-						</p>
-						std::weak_ptr: now you can safely hold a pointer to the parent object in a tree-like structure
+						<p>std::unique_ptr</p>
+						<br>
+						<p><ul>
+							<li>Expresses unique ownership of the wrapped pointer</li>
+							<li>It will "delete" the inner object going out of scope</li>
+							<li>It does not allow copies (move operations are allowed)</li>
+							<li>It can pass (or better "move") the object ownership to another std::unique_ptr, 
+							making it its new (and unique) owner</li>
+						</ul></p>	
+					</section>
+					
+					<section>	
+						<p>std::shared_ptr</p>
+						<br>
+						<p><ul>
+							<li></li>
+							<li></li>
+							<li></li>
+						</ul></p>
+						use_cont and ref_count. 
+					</section>
+					
+					<section>	
+						<p>std::weak_ptr</p>
+						<br>
+						<p><ul>
+							<li></li>
+							<li></li>
+							<li></li>
+						</ul></p>
+						now you can safely hold a pointer to the parent object in a tree-like structure
 					</section>
 					
 				</section>					
 				
+				<!-- More on Smart Pointers -->
 				<section>	
 					<h3>Smart Pointers</h3>
 					<section>
-						<p>
-						</p>
-						Shall I pass by reference? Yes.
+						<p>Shall I pass by reference? 
+						<br>Yes.</p>
 					</section>
 					
 					<section>
-						<p>
-						</p>
-						Shall I get the pointer? No. (real world stories tell us that sometimes we actually must do that, e.g. QObject::connect)
+						<p>Shall I get the internal pointer? 
+						<br>Usually not but in several real world applications we often must do that (e.g. QObject::connect)</p>
 					</section>
 					
 					<section>
-						<p>
-						</p>
-						Helper functions make_unique, make_shared, can't access you private ctors. Use explicit initialization.
+						<p>Helper functions std::make_unique, std::make_shared, can't access you private ctors. 
+						<br>Use explicit initialization</p>
 					</section>
 					
 					<section>
-						<p>
-						</p>
-						Beware of other frameworks "stealing" policies (e.g. QVector, ahrrrr).
+						<p>Beware of "Ownership Stealing" policies.
+						<br>Sometimes the ownership is transferred and double deletion (i.e. crash) may occur.</p>
+					</section>
+					
+				</section>
+				
+				<!-- lvalues and rvalues -->
+				<section>
+					<h3><i>lvalues</i>&ensp; vs. &ensp;<i>rvalues</i></h3>
+					
+					<section>
+						<p>An <span id="c1"><i>lvalue</i></span> is an object or expression whose address can be taken.</p>
+						<br>
+						<p><ul>
+							<li>It is possible to locate an lvalue in a piece of memory</li>
+							<li>It is possible to make an assignment to an lvalue</li> 
+						</ul></p>
+					</section>
+					
+					<section>	
+						<p><i>lvalue</i> example</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+std::string x;
+x = "42"s; // x is an lvalue
+						</code></pre></p>
+						<p>In fact it is possible to take its address and to assign it a value</p>				
 					</section>
 					
 					<section>
-						<p>
-						</p>
-						Double deletion is still a thing, and a guaranteed crash.
+						<p>An <span id="c1"><i>rvalue</i></span> is an unnamed object or expression...
+						<br>
+						which is not an lvalue.</p>
+						<br>
+						<p><ul>
+							<li>It is <b>not</b> possible to locate an rvalue in a piece of memory</li> 
+							<li>It is possible to assign an rvalue to an lvalue</li> 
+						</ul></p>						
+					</section>
+					
+					<section>	
+						<p><i>rvalue</i> example</p>
+						<p><pre><code class="cpp" data-trim contenteditable>
+std::string y;
+y = "42"s + "43"s; // the expression: "42"s + "43"s is an rvalue
+						</code></pre></p>
+						<p><ul>
+							<li>The expression address cannot be taken</li>
+							<li>The value exists only during the expression evaluation
+								<br>(destroyed after assignment)</li>
+							<li>It is possible to assign the expression result to an lvalue</li> 
+						</ul></p>						
+					</section>
+					
+					<section>
+						<p>Another <i>rvalue</i> example</p>
+						<p><pre><code class="cpp" data-trim contenteditable>
+std::string getValue () {
+    return "Fourty-Two"s;
+}
+...
+std::string s = getValue(); 
+						</code></pre></p>
+						<p><ul>
+							<li>The string returned by getValue() is an rvalue</li>
+							<li>In fact it is not possible to take its address</li> 
+							<li>But it can be assigned to an lvalue</li> 
+						</ul></p>
+						<p>Note that whenever there is an assignment we have a <span id="c1">useless copy</span></p>
+					</section>
+					
+					<section>	
+						<p>So, can't we avoid useless copies and boost performances?</p>
+						<br>
+						<p>From C++11 it is possible to "use" (or better, "consume") rvalues in order to <span id="c1">avoid useless copies.</span></p>
+						<br>
+						<small>Remeber that last time we discussed about RVO (Return Value Optimization),
+						which was an implicit technique implemented by default in modern compilers to avoid copies on return values.
+						<br>In the next section we are going to see how to make this explicitly, not only applicable for return values.</small>
 					</section>
 					
 				</section>
@@ -192,19 +327,31 @@ Segment* segment = manager->CreateSegment(pointA, pointB);
 				<section>
 					<h3>Move Semantics</h3>
 					<section>	
-						<p>
-						</p>
+						<p>What does it really means to move an object?</p>
+						Declaring a so-called rvalue reference (&&), 
+						we are explicitly telling the compiler that the 
+						
 						How does it look like (&&) vs what it really is  (static_cast).
 					</section>
 					
 					<section>	
-						<p><i>lvalue</i>&ensp; vs. &ensp;<i>rvalue</i></p>
+						<p><pre><code class="cpp" data-trim contenteditable>
+						
+						</code></pre></p>
 					</section>
 					
 					<section>	
 						<p>
 						</p>
 						"It's going to die anyway" state of mind.
+					</section>
+					
+					<section>	
+						<p>
+						Note the the utility functions std::make_unique&lt;T&gt;() and std::make_shared&lt;T&gt;() 
+						makes extensive use of move semantics exploiting 
+						the concept of "perfect forwarding".
+						</p>
 					</section>
 					
 					<section>	
