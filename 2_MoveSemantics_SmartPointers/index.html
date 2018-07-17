@@ -38,7 +38,7 @@
 				<section>	
 					<h3>Ownership</h3>
 					<section>
-						<p>The owner is responsible for the management of a given resource.</p>
+						<p>The owner is responsible for the management of a given resource (i.e. thread or file handle)</p>
 						<small>The main problem arises on memory deallocation.</small>
 						<br>
 						<p>
@@ -50,18 +50,19 @@
 					
 					<section>						
 						<p> 
-							Always prefer <span id="c1">*</span>Stack allocations with respect to 
-							<span id="c1">**</span>Heap allocations.
+							Always prefer <span id="c1">*Stack</span> allocations with respect to 
+							<span id="c1">**Heap</span> allocations.
 						</p>
+						<br>
 						<p>
 							<span id="c1">*</span>Automatic object deallocation occurs going out of scope.
 							<br>
-							You do not need to take care of that.
+							<small>You do not need to take care of that.</small>
 						</p>
 						<p>
 							<span id="c1">**</span>Object deallocation needs to be handled in some ways.
 							<br>
-							You do must take care of that.
+							<small>You do must take care of that.</small>
 						</p>
 					</section>
 					
@@ -120,7 +121,7 @@ Segment* segment = manager->CreateSegment(pointA, pointB);
 					
 					<section>	
 						<p>
-							Note that the ownership hierarchy on the previous example is not clear at all:
+							Note that the ownership <span id="c1">hierarchy</span> on the previous example is not clear at all:
 							<br>
 							You must read each class implementation to understand the objects hierarchy.
 						</p>	
@@ -135,23 +136,23 @@ Segment* segment = manager->CreateSegment(pointA, pointB);
 									<br>(e.g. manager owns segment, segment owns pointA and pointB)</li>
 								<li>Or a global manager ownership? (manager owns everything)</li>
 								<li>Or not even ownership at all? (no one owns anything)</li>
-								<li>And of course pay attention not to delete an object two times.
-									<br>Note that even the order of delete operations matters.</li>
-							</ul>
-						</p>		
+							</ul>								
+						</p>	
+						<small>And of course pay attention not to delete an object two times.						
+						<br>Note that even the order of delete operations matters.</small>						
 					</section>	
 
 					<section>	
 						<p>
 							So, why do we care?
 						</p>
-						Readability, Testability, Expressivity.
+						<span id="c1">Readability, Testability, Expressivity.</span>
 						<br>
 						<small>... and of course bugs and crashes!</small>
 						<p>
 							Does the modern standards provide any utility for (smart) resource management?		
 						</p>	
-						Smart Pointers is the way to go.
+						Smart Pointers is the answer to our question.
 					</section>	
 					
 				</section>
@@ -162,35 +163,40 @@ Segment* segment = manager->CreateSegment(pointA, pointB);
 					<section>
 					From C++11 the standard library provides 3 different utility classes that helps dealing with memory management:
 						<p><ul>
-							<li><span id="c1">std::unique_ptr&lt;T&gt; <span></li>
-							<li><span id="c1">std::shared_ptr&lt;T&gt; <span></li>
-							<li><span id="c1">std::weak_ptr&lt;T&gt; <span></li>
+							<li><span id="c1">std::unique_ptr&lt;T&gt; </span></li>
+							<li><span id="c1">std::shared_ptr&lt;T&gt; </span></li>
+							<li><span id="c1">std::weak_ptr&lt;T&gt; </span></li>
 						</ul></p>
 					</section>
 					
 					<section>					
-						<p>The common idea is that each class provides a wrapper around a pointer to a class T.</p>
+						<p>The common idea is that each class provides a <span id="c1">wrapper</span> around a pointer to a class T.</p>
 						<p>All the "Smart Pointer" classes mimic the behavior of a "Raw Pointer" (also providing same syntax)</p>	
-						<p>A great fatures is the so-called "Reference counting" mechanism that allows to
-						automatically deallocate the pointer as soon as the its last reference gets deleted.</p>
+						<p>A great fatures is the so-called <span id="c1">"Reference counting"</span> mechanism that allows
+						automatic deallocation of the inner pointer as soon as its last reference gets deleted.</p>
 					</section>
 					
 					<section>	
 						<p>Reference Counting</p>
-						<p>Roughly speaking it is the number of instances that have a reference to the same object</p>	
+						<br>
+						<p>Roughly speaking it is the <span id="c1">number of instances</span> that have a reference to the same object</p>	
 						<p>It is safe to assume that is possible to delete an object when it is no more referenced by any other objects 
 						(i.e. it reference count is zero)</p>
-						<p>This technique is commonly used in managed languages such as Python, Java and C# 
-						in which the memory management is not directly handled by the programmer.</p>
-						<p></p>
 					</section>
 					
 					<section>	
-						<p>std::unique_ptr</p>
+						<p>Reference Counting</p>
 						<br>
+						<p>This technique is commonly used in managed languages such as Python, Java and C# 
+						in which the memory management is not directly handled by the programmer.</p>
+						<p>Completely transparent for the user, with nearly <span id="c1">zero overhead.</span></p>						
+					</section>
+					
+					<section>	
+						<p><span id="c1">std::unique_ptr</span></p>
 						<p><ul>
-							<li>Expresses unique ownership of the wrapped pointer</li>
-							<li>It will "delete" the inner object going out of scope</li>
+							<li>Expresses <span id="c1">unique</span> ownership of the wrapped pointer</li>
+							<li>It will delete the inner raw pointer going out of scope</li>
 							<li>It does not allow copies (move operations are allowed)</li>
 							<li>It can pass (or better "move") the object ownership to another std::unique_ptr, 
 							making it its new (and unique) owner</li>
@@ -198,54 +204,115 @@ Segment* segment = manager->CreateSegment(pointA, pointB);
 					</section>
 					
 					<section>	
-						<p>std::shared_ptr</p>
+						<p><span id="c1">std::unique_ptr</span> examples</p>
 						<br>
-						<p><ul>
-							<li></li>
-							<li></li>
-							<li></li>
-						</ul></p>
-						use_cont and ref_count. 
+						<p><pre><code class="cpp" data-trim contenteditable>
+#include &lt;memory&gt;
+
+// Ordinary initialization
+std::unique_ptr&lt;Shape&gt; smartCircle(new Circle());
+
+// Polymorphic creation using thread-safe helper function
+auto smartSquare = std::make_unique&lt;Square&gt;();
+
+// Move assignment
+auto smartestSquare = std::move(smartSquare);
+						</code></pre></p>
 					</section>
 					
 					<section>	
-						<p>std::weak_ptr</p>
-						<br>
+						<p><span id="c1">std::shared_ptr</span></p>
 						<p><ul>
-							<li></li>
-							<li></li>
-							<li></li>
+							<li>Expresses shared ownership of the wrapped pointer</li>
+							<li>Use it to assign the same raw pointer to <span id="c1">multiple owners</span></li>
+							<li>The inner raw pointer will be deleted when the last shared_ptr owners goes out of scope</li>
+							<li>Copying a shared_ptr will increase the reference count, 
+							viceversa deleting or going out of scope will decrease it</li>
 						</ul></p>
-						now you can safely hold a pointer to the parent object in a tree-like structure
 					</section>
 					
-				</section>					
+					<section>	
+						<p><span id="c1">std::shared_ptr</span> examples</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+Square* square = new Square();
+{
+    std::shared_ptr&lt;Square&gt; smartSquare1(square);
+    std::shared_ptr&lt;Square&gt; smartSquare2(square);
+}
+// crash! (double delete on square pointer)
+
+auto smartCircle = std::make_shared&lt;Circle&gt;();
+Circle* circle = smartCircle.get(); // get the inner pointer
+// to be avoided, but legal
+						</code></pre></p>
+					</section>
+					
+					<section>	
+						<p><span id="c1">std::weak_ptr</span></p>
+						<p><ul>
+							<li><span id="c1">"Read-only"</span> version of shared_ptr</li>
+							<li>It gives access to an object that is owned by one or more shared_ptr, 
+							without incrementing its reference counter</li>
+							<li>It is useful to break circular references between shared_ptr instances</li>
+						</ul></p>						
+					</section>
+					
+					<section>	
+						<p><span id="c1">std::weak_ptr</span> examples</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+struct Node{
+   std::vector&lt;std::shared_ptr&lt;Node&gt;&gt; mChildNodes;
+   std::weak_ptr&lt;Node&gt; mParentNode;
+};
+// can hold a pointer to the parent object 
+// in a tree-like structure avoiding a dangling reference
+
+auto smartSquare = std::make_shared&lt;Square&gt;();
+std::weak_ptr&lt;Square&gt; weakSquare;
+auto weakSquare  = smartSquare; // assign share_ptr to weak_ptr
+auto innerSquare = smartSquare.lock();
+// can be converted back to the original shared_ptr
+						</code></pre></p>					
+					</section>
 				
-				<!-- More on Smart Pointers -->
-				<section>	
-					<h3>Smart Pointers</h3>
+				</section>
+			
+				<!-- Smart Pointers F.A.Q. -->
+				<section>
+					<p>Smart Pointers F.A.Q.</p>
+					
 					<section>
-						<p>Shall I pass by reference? 
-						<br>Yes.</p>
+						<p>Shall I pass by reference?</p>
+						<br>
+						Yes.
+						<br>
+						<small>Note that passing by value will generate a copy that will increase the reference count</small>
 					</section>
 					
 					<section>
-						<p>Shall I get the internal pointer? 
-						<br>Usually not but in several real world applications we often must do that (e.g. QObject::connect)</p>
+						<p>Shall I get the internal pointer?</p>
+						<br>
+						Usually not but in several real world applications we often must do that (e.g. QObject::connect)
+						<br>
+						<small>There is no automatic conversion between smart and raw pointers</small>
 					</section>
 					
 					<section>
-						<p>Helper functions std::make_unique, std::make_shared, can't access you private ctors. 
-						<br>Use explicit initialization</p>
+						<p>Helper functions std::make_unique, std::make_shared, can't access you private ctors.</p>
+						<br>
+						Use explicit initialization
 					</section>
 					
 					<section>
-						<p>Beware of "Ownership Stealing" policies.
-						<br>Sometimes the ownership is transferred and double deletion (i.e. crash) may occur.</p>
-					</section>
+						<p>Beware of "Ownership Stealing" policies.</p>
+						<br>
+						Sometimes the ownership is transferred and double deletion (i.e. crash) may occur.
+					</section>	
 					
 				</section>
-				
+			
 				<!-- lvalues and rvalues -->
 				<section>
 					<h3><i>lvalues</i>&ensp; vs. &ensp;<i>rvalues</i></h3>
