@@ -101,7 +101,7 @@ delete square;
 						</code></pre></p>
 						<small>At some point you must delete explicitly both circle and square objects in order to avoid memory leaks.</small>
 						<br>
-						<small>We can safely assume that calling delete on both circle and square objects is our duty.</small>
+						<small>Here, we can safely assume that calling delete on both circle and square objects is our duty.</small>
 					</section>	
 					
 					<section>	
@@ -187,7 +187,7 @@ Segment* segment = manager->CreateSegment(pointA, pointB);
 					<section>	
 						<p>Reference Counting</p>
 						<br>
-						<p>This technique is commonly used in managed languages such as Python, Java and C# 
+						<p>This technique is commonly used in <span id="c1">managed languages</span> such as Python, Java and C# 
 						in which the memory management is not directly handled by the programmer.</p>
 						<p>Completely transparent for the user, with nearly <span id="c1">zero overhead.</span></p>						
 					</section>
@@ -242,6 +242,7 @@ Square* square = new Square();
 }
 // crash! (double delete on square pointer)
 
+
 auto smartCircle = std::make_shared&lt;Circle&gt;();
 Circle* circle = smartCircle.get(); // get the inner pointer
 // to be avoided, but legal
@@ -269,9 +270,10 @@ struct Node{
 // can hold a pointer to the parent object 
 // in a tree-like structure avoiding a dangling reference
 
+
 auto smartSquare = std::make_shared&lt;Square&gt;();
 std::weak_ptr&lt;Square&gt; weakSquare;
-auto weakSquare  = smartSquare; // assign share_ptr to weak_ptr
+auto weakSquare  = smartSquare; // assign shared_ptr to weak_ptr
 auto innerSquare = smartSquare.lock();
 // can be converted back to the original shared_ptr
 						</code></pre></p>					
@@ -284,7 +286,7 @@ auto innerSquare = smartSquare.lock();
 					<p>Smart Pointers F.A.Q.</p>
 					
 					<section>
-						<p>Shall I pass by reference?</p>
+						<p>Shall I pass by <span id="c1">reference</span>?</p>
 						<br>
 						Yes.
 						<br>
@@ -292,7 +294,7 @@ auto innerSquare = smartSquare.lock();
 					</section>
 					
 					<section>
-						<p>Shall I get the internal pointer?</p>
+						<p>Shall I get the <span id="c1">internal pointer</span>?</p>
 						<br>
 						Usually not but in several real world applications we often must do that (e.g. QObject::connect)
 						<br>
@@ -300,13 +302,13 @@ auto innerSquare = smartSquare.lock();
 					</section>
 					
 					<section>
-						<p>Helper functions std::make_unique, std::make_shared, can't access you private ctors.</p>
+						<p>Helper functions std::make_unique, std::make_shared, can't access your class<span id="c1"> private constructor.</span></p>
 						<br>
 						Use explicit initialization
 					</section>
 					
 					<section>
-						<p>Beware of "Ownership Stealing" policies.</p>
+						<p>Beware of <span id="c1">Ownership Stealing</span> policies.</p>
 						<br>
 						Sometimes the ownership is transferred and double deletion (i.e. crash) may occur.
 					</section>	
@@ -333,7 +335,7 @@ auto innerSquare = smartSquare.lock();
 std::string x;
 x = "42"s; // x is an lvalue
 						</code></pre></p>
-						<p>In fact it is possible to take its address and to assign it a value</p>				
+						<p>In fact it is possible to take its address and to assign a value to it</p>				
 					</section>
 					
 					<section>
@@ -355,8 +357,7 @@ y = "42"s + "43"s; // the expression: "42"s + "43"s is an rvalue
 						</code></pre></p>
 						<p><ul>
 							<li>The expression address cannot be taken</li>
-							<li>The value exists only during the expression evaluation
-								<br>(destroyed after assignment)</li>
+							<li>The value exists only during the expression evaluation (destroyed after assignment)</li>
 							<li>It is possible to assign the expression result to an lvalue</li> 
 						</ul></p>						
 					</section>
@@ -397,14 +398,14 @@ std::string s = getValue();
 						<p>What does it really means to move an object?</p>
 						<p>Starting from C++11 the STL introduces std::move(). 
 						It is just a <span id="c1">static cast</span> to an rvalue refenrece:</p>
-						<p>It is now possible to convert an lvalue into a temporary object (rvalue) avoiding useless copies</p>
-						<br>
+						<p>It is now possible to convert an lvalue into a <span id="c1">temporary</span> object (rvalue) avoiding useless copies</p>
+						
 						<p><pre><code class="cpp" data-trim contenteditable>
 Foo myFoo;
 
 auto myRvalueFoo1 = std::move(myFoo);
 
-auto myRvalueFoo2 = static_cast<&&Foo>(myFoo); 
+auto myRvalueFoo2 = static_cast&lt;&&Foo&gt;(myFoo); 
 
 // equivalent definitions
 						</code></pre></p>
@@ -412,22 +413,22 @@ auto myRvalueFoo2 = static_cast<&&Foo>(myFoo);
 					
 					<section>	
 						<p>"It's going to die anyway" state of mind.</p>
-						<p>After you move an object is going to be in a <span id="c1">non valid state</span></p>
-						<small>This is the key to get optimal benefit from move semantics</small>
+						<p>After you move an object it is going to be in a <span id="c1">non-valid state</span></p>
+						<small>This is the key to get optimal benefit from move semantics: move all the time you do not need the temporary any longer.</small>
 					</section>
 					
 					<section>
 						<p>lvalue vs. rvalue move example</p>
 						<p><pre><code class="cpp" data-trim contenteditable>
-void foo(int&  i) { std::cout << "lvalue"; }
-void foo(int&& i) { std::cout << "rvalue"; }
+void foo(int&  i) { std::cout &lt;&lt; "lvalue"; }
+void foo(int&& i) { std::cout &lt;&lt; "rvalue"; }
 
 int main(){
-    int i = 77;
-    foo(i);    // lvalue ref called
-    foo(99);   // rvalue ref called
+    int i = 42;
+    foo(i);    // lvalue called
+    foo(42);   // rvalue called
 
-    foo(std::move(i));  // rvalue ref called
+    foo(std::move(i));  // rvalue called
 
     return 0;
 }
@@ -447,7 +448,7 @@ public:
     }
 	
     Foo& operator=(Foo&& other) {
-        if(this != &other) { // prevent self-destruction
+        if(this != &other) { // Prevent self-destruction
             if(value) { delete value; }
             value = other.value;
             other.value = nullptr;
@@ -466,7 +467,8 @@ public:
 						<p>"Smart" Move Constructor and Move Assignement example</p>
 						<p><pre><code class="cpp" data-trim contenteditable>
 class Foo {
-    std::unique_ptr<int> value = nullptr;
+    // unique_ptr already embeds move semantics behavior
+    std::unique_ptr&lt;int&gt; value = nullptr;
 
 public:
     Foo(Foo&& other) = default;
@@ -481,20 +483,26 @@ public:
 					<section>
 						<p>Usage example</p>
 						<p><pre><code class="cpp" data-trim contenteditable>
+struct Bar {
+    Bar(std::unique_ptr&lt;int&gt;& v) : barValue{std::move(v)} { }
+    std::unique_ptr&lt;int&gt; barValue;
+};
+
 int main() {
-    std::cout << "Hello World!\n";
-  
-    auto value = std::make_unique<int>(42);
+    auto value = std::make_unique&lt;int&gt;(42);
 	
-    std::cout << *value.get(); // ok
+    std::cout &lt;&lt; *value.get(); // OK
 	
-    auto foo = Foo(value); // now foo has unique ownership of value
-  
-    std::cout << *value.get(); // crash!
+    // Now bar has unique ownership of value
+    auto bar = Bar(value); 
+    
+    // value is no longer defined
+    std::cout &lt;&lt; *value.get(); // Crash!
 	
     return 0;
 }
 						</code></pre></p>
+						<small>To avoid such a situation call std::make_unique&lt;int&gt; directly in Bar constructor</small>
 					</section>
 					
 					<section>	
@@ -502,9 +510,9 @@ int main() {
 						<p><pre><code class="cpp" data-trim contenteditable>
 std::string str = "Hello"; // std::string defines move operations
 
-std::vector<std::string> stringVector;
+std::vector&lt;std::string&gt; stringVector;
 
-stringVector.push_back(str); // copy here
+stringVector.push_back(str); // Copy here
 
 stringVector.push_back(std::move(str)); // NO copy here
 
@@ -515,19 +523,17 @@ stringVector.push_back(std::move(str)); // NO copy here
 
 					<section>	
 						<p>"Smart" move operations into STL container</p>
-class Foo { Foo(int a, std::string b, double c){ /* ... */} };
+						<p><pre><code class="cpp" data-trim contenteditable>
+class Foo { 
+    Foo(int a, std::string b, double c){ /* ... */} 
+};
 
-std::vector<Foo> fooVector;
+std::vector&lt;Foo&gt; fooVector;
 
 fooVector.emplace(42, "Fourty-Two", 4.2); // NO copy here. 
 // emplace provides in-place construction & push_back operations
 						</code></pre></p>
 						<small>Note that emplace creates the object by means of arguments forwarding.</small>
-					</section>
-					
-					<section>	
-						<p>
-						</p>
 					</section>
 					
 				</section>
