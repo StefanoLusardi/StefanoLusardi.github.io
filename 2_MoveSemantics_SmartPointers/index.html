@@ -238,8 +238,8 @@ auto smartestSquare = std::move(smartSquare);
 Square* square = new Square();
 {
     std::shared_ptr&lt;Square&gt; smartSquare1(square);
-    std::shared_ptr&lt;Square&gt; smartSquare2(square);
 }
+std::shared_ptr&lt;Square&gt; smartSquare2(square);
 // crash! (double delete on square pointer)
 
 
@@ -335,7 +335,7 @@ auto innerSquare = smartSquare.lock();
 std::string x;
 x = "42"s; // x is an lvalue
 						</code></pre></p>
-						<p>In fact it is possible to take its address and to assign a value to it</p>				
+						<p>In fact it is possible both to take its address and to assign a value to it</p>				
 					</section>
 					
 					<section>
@@ -405,7 +405,7 @@ Foo myFoo;
 
 auto myRvalueFoo1 = std::move(myFoo);
 
-auto myRvalueFoo2 = static_cast&lt;&&Foo&gt;(myFoo); 
+auto myRvalueFoo2 = static_cast&lt;Foo&&&gt;(myFoo); 
 
 // equivalent definitions
 						</code></pre></p>
@@ -496,7 +496,7 @@ int main() {
     // Now bar has unique ownership of value
     auto bar = Bar(value); 
     
-    // value is no longer defined
+    // value is in a non-valid state (nullptr)
     std::cout &lt;&lt; *value.get(); // Crash!
 	
     return 0;
