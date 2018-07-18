@@ -395,37 +395,139 @@ std::string s = getValue();
 					<h3>Move Semantics</h3>
 					<section>	
 						<p>What does it really means to move an object?</p>
-						Declaring a so-called rvalue reference (&&), 
-						we are explicitly telling the compiler that the 
-						
-						How does it look like (&&) vs what it really is  (static_cast).
-					</section>
-					
-					<section>	
+						<p>Starting from C++11 the STL introduces std::move(). 
+						It is just a <span id="c1">static cast</span> to an rvalue refenrece:</p>
+						<p>It is now possible to convert an lvalue into a temporary object (rvalue) avoiding useless copies</p>
+						<br>
 						<p><pre><code class="cpp" data-trim contenteditable>
-						
+Foo myFoo;
+
+auto myRvalueFoo1 = std::move(myFoo);
+
+auto myRvalueFoo2 = static_cast<&&Foo>(myFoo); 
+
+// equivalent definitions
 						</code></pre></p>
 					</section>
 					
 					<section>	
-						<p>
-						</p>
-						"It's going to die anyway" state of mind.
+						<p>"It's going to die anyway" state of mind.</p>
+						<p>After you move an object is going to be in a <span id="c1">non valid state</span></p>
+						<small>This is the key to get optimal benefit from move semantics</small>
+					</section>
+					
+					<section>
+						<p>lvalue vs. rvalue move example</p>
+						<p><pre><code class="cpp" data-trim contenteditable>
+void foo(int&  i) { std::cout << "lvalue"; }
+void foo(int&& i) { std::cout << "rvalue"; }
+
+int main(){
+    int i = 77;
+    foo(i);    // lvalue ref called
+    foo(99);   // rvalue ref called
+
+    foo(std::move(i));  // rvalue ref called
+
+    return 0;
+}
+						</code></pre></p>
+					</section>
+					
+					<section>
+						<p>Move Constructor and Move Assignement example</p>
+						<p><pre><code class="cpp" data-trim contenteditable>
+class Foo {
+    int* value = nullptr;
+	
+public:    
+	Foo(Foo&& other) { // Note non-const &&
+        value = other.value;
+        other.value = nullptr;
+    }
+	
+    Foo& operator=(Foo&& other) {
+        if(this != &other) { // prevent self-destruction
+            if(value) { delete value; }
+            value = other.value;
+            other.value = nullptr;
+        }
+		return *this;
+    }
+	
+    ~Foo() {
+        if(value) { delete value; }
+    }
+};
+						</code></pre></p>
+					</section>
+					
+					<section>
+						<p>"Smart" Move Constructor and Move Assignement example</p>
+						<p><pre><code class="cpp" data-trim contenteditable>
+class Foo {
+    std::unique_ptr<int> value = nullptr;
+
+public:
+    Foo(Foo&& other) = default;
+	
+    Foo& operator=(Foo&& other) = default;
+	
+    ~Foo() = default;
+};
+						</code></pre></p>
+					</section>
+					
+					<section>
+						<p>Usage example</p>
+						<p><pre><code class="cpp" data-trim contenteditable>
+int main() {
+    std::cout << "Hello World!\n";
+  
+    auto value = std::make_unique<int>(42);
+	
+    std::cout << *value.get(); // ok
+	
+    auto foo = Foo(value); // now foo has unique ownership of value
+  
+    std::cout << *value.get(); // crash!
+	
+    return 0;
+}
+						</code></pre></p>
+					</section>
+					
+					<section>	
+						<p>Move operations into STL container</p>
+						<p><pre><code class="cpp" data-trim contenteditable>
+std::string str = "Hello"; // std::string defines move operations
+
+std::vector<std::string> stringVector;
+
+stringVector.push_back(str); // copy here
+
+stringVector.push_back(std::move(str)); // NO copy here
+
+// Now str is empty. Do not use it anymore.
+						</code></pre></p>
+						<small>Note that STL provides overloaded functions for its container in order to avoid useless copies</small>
+					</section>
+
+					<section>	
+						<p>"Smart" move operations into STL container</p>
+class Foo { Foo(int a, std::string b, double c){ /* ... */} };
+
+std::vector<Foo> fooVector;
+
+fooVector.emplace(42, "Fourty-Two", 4.2); // NO copy here. 
+// emplace provides in-place construction & push_back operations
+						</code></pre></p>
+						<small>Note that emplace creates the object by means of arguments forwarding.</small>
 					</section>
 					
 					<section>	
 						<p>
-						Note the the utility functions std::make_unique&lt;T&gt;() and std::make_shared&lt;T&gt;() 
-						makes extensive use of move semantics exploiting 
-						the concept of "perfect forwarding".
 						</p>
-					</section>
-					
-					<section>	
-						<p>
-						</p>
-						Please declare non-const move argument for assignment operations.
-						An example on move constructor implementation.
 					</section>
 					
 				</section>
