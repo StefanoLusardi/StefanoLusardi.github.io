@@ -249,33 +249,37 @@ int sumPar = std::reduce(
 					<section>
 						<br>
 						<p>Capture Group</p>
+						<p>
+							<ul>
+								<li>[ ]: empty capture list
+									<br><small>No local variables from the enclosing scope can be used in the lambda body</small></li>
+								<li>[&]: capture by reference
+									<br><small>All local variables from the enclosing scope are accessed by reference</small></li>
+								<li>[=]: capture by value
+									<br><small>All local variables from the enclosing scope are accessed by copy</small></li>
+								<li>[capture-list]: capture only specified variables
+									<br><small>Any combination of the previous is possible</small></li>
+							</ul>
+						</p>
+						<small>Note that a local name preceded by & is always captured by reference and 
+							a local name not preceded by & is always captured by value</small>
+					</section>
+					
+					<section>
 						<br>
-						<p></p>
-						[ ]: empty capture list. 
-    No local variables from the enclosing scope can be used in the lambda body.
-[&]: capture by reference. 
-    All local variables from the enclosing scope are accessed by reference.
-[=]: capture by value. 
-    All local variables from the enclosing scope are accessed by copy.
-[capture-list]: explicit capture list. 
-    Only the specified variables are captured from the enclosing scope. 
-    the capture-list is the list of names of local variables to be captured 
-    (i.e., stored in the object) by reference or by value. 
-    Variables with names preceded by & are captured by reference. 
-    Other variables are captured by value. 
-    A capture list can also contain this and names followed by ... as elements.
-[&, capture-list]: implicitly capture by reference all local variables with names not men- tioned in the list. The capture list can contain this. Listed names cannot be preceded by &. Variables named in the capture list are captured by value.
-[=, capture-list]: implicitly capture by value all local variables with names not mentioned in the list. The capture list cannot contain this. The listed names must be preceded by &. Vari- ables named in the capture list are captured by reference.
-
-Note that a local name preceded by & is always captured by reference and a local name not pre- ceded by & is always captured by value.
-
-// example:
+						<p>Capture Group example</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
 int x = 4;
-auto y = [&r = x, x = x+1]() -> int 
+auto y = [&xRef = x, xCopy = x+1]() -> int 
 {
-    r += 2;
-    return x+2;
-}();  // Updates ::x to 6, and initializes y to 7.						
+    // xCopy is 5, global x is still 4
+    xRef += 2; // global x incremented by 2
+    return xCopy+2; // xCopy is incremented by 2
+}(); 	
+// x = 6
+// y = 7
+						</code></pre></p>
 					</section>
 					
 					<section>
