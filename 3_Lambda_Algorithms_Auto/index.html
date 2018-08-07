@@ -21,8 +21,579 @@
 					<p>
 						<small>Stefano Lusardi, Software Developer</small>
 					</p>
-				</section>				
+				</section>
 				
+				<!-- Agenda -->
+				<section>
+					<h3 id="c1">Agenda</h3>
+					<br>
+					<p><ul>						
+						<li>std::algorithms</li>						
+						<li>Lambda Functions</li>						
+						<li><i>auto</i> keyword</li>
+					</ul></p>
+				</section>
+
+				<!-- std::algorithms -->
+				<section>	
+					<h3>std::algorithms</h3>
+					<br>	
+					<section>
+						<br>	
+						<p>What is an std::algorithm?</p>
+						<br>	
+						<p>It is a functions designed to address <span id="c1">general purpose</span> problems 
+							that can be used on a <span id="c1">range</span> of elements.</p>
+						<p>Since the STL is just all about Containers, Iterators and Algorithms 
+							it is designed to have the best possible interaction between these components</p>
+						<br>
+						<small>See the full reference <a href="https://en.cppreference.com/w/cpp/algorithm" id="c1">here</a></small>	
+					</section>
+					
+					<section>
+						<p>Why do we need an algorithm library
+							<br><small>(in Modern C++)</small> ?</p>
+						<br>
+						<p><span id="c1">Expressive, Solid, and Reusable</span> chunks of code.</p>
+						<br>
+						<p>Do you remember the initial example given in the first talk?</p>	
+					</section>
+
+					<section>
+						<br>					
+						<p><pre><code class="cpp" data-trim contenteditable>
+// 1. "Raw" for loop
+int c = 0;
+for (int i = 0; i &lt; myVec.size(); ++i) {
+    myVec[i] == 5 && ++c;
+}
+						</code></pre></p>						
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+// 2. Modern algorithm
+int c = std::count(begin(myVec), end(myVec), 5);
+						</code></pre></p>
+						<br>
+					</section>
+
+					<section>
+						<br>
+						<p>A brief recap/comparison of the two approaches:</p>
+						<p>
+							<ul>
+								<span id="c1">1. Cons:</span>
+								<li>Hand-made for loop 
+									<br><small>(How many time did you mess up with loop indexes?)</small></li>
+								<li>Not immediately clear logic</li>
+							</ul>
+							<br>
+							<ul>
+								<span id="c1">2. Pros:</span>
+								<li>Automatic loop unrolling 
+									<br><small>(No more worries about indexes!)</small></li>
+								<li>Easy to understand logic</li>
+							</ul>
+						</p>
+					</section>
+
+					<section>
+						<br>
+						<p>How does an algorithm work?</p>
+						<p>The algorithm is applied on a given container <span id="c1">range</span>, typically defined as: <i>first</i>, <i>last</i>.</p>
+						<p>According to the specific algorithm we are using we can have (or we can't have) several guarantees such as: 
+						<br>Modifying, Non-Modifying, Searching, Sorting... </p>
+						<p>Usually the pair <span id="c1">begin(), end()</span> iterators are used to define the sequence range, 
+							but there is no restriction set on the input range.</p>	
+					</section>
+
+					<section>
+						<br>
+						<p>Iterators range. Any differences?</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+int c = std::count(begin(myVec), end(myVec), 5);
+						</code></pre></p>
+						<p><pre><code class="cpp" data-trim contenteditable>
+int c = std::count(myVec.begin(), myVec.end(), 5);
+						</code></pre></p>
+						<br>
+						<small>The first examplese uses free functions while the second uses std::vector member fucntions</small>	
+						<small>Note that the second example cannot work with C-style arrays, while the first is also able to accomodate them</small>	
+					</section>
+
+					<section>
+						<br>
+						<p>Single responsability principle</p>
+						<br>
+						<p>Note that even if algorithms and lambdas are an extreme powerful resource 
+							it is always better not to increase the code <span id="c1">complexity and readability</span> creating extremely complicated and nested logics.</p>
+						<br>
+						<p>Function still serves as functions!</p>
+						<br>
+						
+					</section>
+
+					<section>
+						<br>
+						<p>std::algorithm with a predicate</p>
+						<br>
+						<p>Example: std::find and std::find_if</p>	
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+// Finds a given elem into myVec
+int a = std::find(myVec.begin(), myVec.end(), /*elem*/);
+
+// Finds an element which satisfies a given predicate
+int b = std::find_if(myVec.begin(), myVec.end(), /*predicate*/);
+						</code></pre></p>
+					</section>
+
+					<section>
+						<br>
+						<p>A predicate can be a so-called <i>Functor<span id="c1">*</span></i> (before C++11) or a <i>Lambda Function</i></p>
+						<br>
+						<p>Example: std::find_if with a predicate</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+int f = std::find_if(myVec.begin(), myVec.end(), 
+    [](const Foo& foo){ return foo.value == 42; });
+						</code></pre></p>
+						<br>
+						<small><span id="c1">*</span>A Functor, strictly speaking, is a class which overrides operator(), 
+							whose instances become callable objects.</small>	
+					</section>
+
+					<section>
+						<br>
+						<p>More on predicates and iterators with std::algorithms</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+std::vector&lt;std::string> strVec {"Not_Me", "Find_Me", "Not_You"};
+
+int index = std::distance(strVec.begin(),
+	std::find_if(strVec.begin(), strVec.end() 
+	[](const std::string& s)
+	{ return s.name == "Find_Me"; })
+);
+						</code></pre></p>	
+					</section>
+
+					<section>
+						<br>
+						<p>C++17 <span id="c1">execution policies</span></p>
+						<br>
+						<p>
+							<ul>
+								<li>std::execution::seq</li>
+								<li>std::execution::par</li>
+								<li>std::execution::par_unseq</li>
+							</ul>
+						</p>
+						<br>
+						<small>Note that it is not possible to apply execution policies to all the std::algorithms.</small>	
+					</section>
+
+					<section>
+						<br>
+						<p>Example: </p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+std::vector&lt;int> myVec { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+// C++11 sequential sum using std::accumulate
+// (can't be parallelized)
+int sumSeq1 = std::accumulate(myVec.begin(), myVec.end(), 0); 
+
+// Equivalent using new C++17 algorithm std::reduce()
+int sumSeq2 = std::reduce(myVec.begin(), myVec.end(), 0);
+
+// C++17 parallel sum
+int sumPar = std::reduce(
+	std::execution::par, myVec.begin(), myVec.end(), 0);
+						</code></pre></p>	
+					</section>
+				</section>
+
+				<!-- Lambda Functions -->
+				<section>	
+					<h3>Lambda Functions</h3>
+					<section>
+						<br>
+						<p>What is a Lambda Function?</p>
+						<small></small>
+						<br>
+						<p>A Lambda Function is an <span id="c1">unnamed</span> and <span id="c1">callable</span> 
+							object, able to capture variables from an enclosing scope.</p>	
+					</section>
+					
+					<section>
+						<br>
+						<p>Anatomy of a Lambda Function</p>
+						<p><pre><code class="cpp" data-trim contenteditable>
+[CaptureGroup](Parameters...) -> ReturnType { Body };
+						</code></pre></p>
+						<p>
+							<ol>
+								<li><span id="c1">Capture Group</span>: Must always be present.
+									See next slide for examples</li>
+								<li><span id="c1">Body</span>: logic of the lambda function. 
+									Can be empty</li>
+								<li><small>(optional)</small><span id="c1">Parameters</span>: same as function parameters. 
+									Can be omitted if not needed</li>
+								<li><small>(optional)</small><span id="c1">Return Type</span>: same as function return type. 
+									Can be automatically deduced</li>
+							</ol>							
+						</p>
+					</section>
+
+					<section>
+						<br>
+						<p>Capture Group</p>
+						<br>
+						<p></p>
+						[ ]: empty capture list. 
+    No local variables from the enclosing scope can be used in the lambda body.
+[&]: capture by reference. 
+    All local variables from the enclosing scope are accessed by reference.
+[=]: capture by value. 
+    All local variables from the enclosing scope are accessed by copy.
+[capture-list]: explicit capture list. 
+    Only the specified variables are captured from the enclosing scope. 
+    the capture-list is the list of names of local variables to be captured 
+    (i.e., stored in the object) by reference or by value. 
+    Variables with names preceded by & are captured by reference. 
+    Other variables are captured by value. 
+    A capture list can also contain this and names followed by ... as elements.
+[&, capture-list]: implicitly capture by reference all local variables with names not men- tioned in the list. The capture list can contain this. Listed names cannot be preceded by &. Variables named in the capture list are captured by value.
+[=, capture-list]: implicitly capture by value all local variables with names not mentioned in the list. The capture list cannot contain this. The listed names must be preceded by &. Vari- ables named in the capture list are captured by reference.
+
+Note that a local name preceded by & is always captured by reference and a local name not pre- ceded by & is always captured by value.
+
+// example:
+int x = 4;
+auto y = [&r = x, x = x+1]() -> int 
+{
+    r += 2;
+    return x+2;
+}();  // Updates ::x to 6, and initializes y to 7.						
+					</section>
+					
+					<section>
+						<br>
+						<p>Anatomy of a std::function object</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+std::function&lt;R(Params...)>
+						</code></pre></p>
+						<br>
+						<p>
+							<ul>
+								<li><span id="c1">R</span>: return type of the wrapped function.</li>
+								<li><small>(optional) </small><span id="c1">Params</span>: types of input parameters</li>
+							</ul>
+						</p>
+					</section>
+					
+					<section>
+						<br>
+						<p>Example: std::function declaration and usage</p>
+						<p><pre><code class="cpp" data-trim contenteditable>
+// wrap a free-function
+void freeFunc(int i, std::string s, double d) { /*...*/ }; 
+std::function&lt;void(int, std::string, double)> myFunc 
+    = freeFunc;
+
+freeFunc(42, "hello world", 0.001); // invoke
+
+// wrap a member function
+class Foo { 
+    void func(double d) { /*...*/ }; 
+}
+std::function&lt;void(const Foo& foo, double)> myFooFunc 
+    = &Foo::func();
+
+myFooFunc(foo, 0.001); // invoke
+						</code></pre></p>
+						<small>std::function is a great replacement (more readable and typesafe) for pointers to function.</small>
+					</section>
+
+					<section>
+						<br>
+						<p>Function objects and Lambdas</p>
+							<br>
+							<p>Since std::function<T(Args...)> is a generic templated function wrapper can be used to store a Lambda Function as:</p>	
+							<p><pre><code class="cpp" data-trim contenteditable>
+// Declaration:
+std::function&lt;void(int)> myPrint = [](int val) -> void 
+{ std::cout << "Printed value: " << val; };
+
+// Usage:
+myPrint(42); // "Printed value: 42"
+							</code></pre></p>
+					</section>
+
+					<section>
+						<br>
+						<p>A more functional style</p>
+						<br>
+						<p>Lambdas and functions objects enables a more functional approach to the Modern C++:</p>
+						<br>
+						<p>Using these tools it is now possible to <span id="c1">declare</span> a function in a <span id="c1">local scope</span> 
+							(i.e. inside another function) and use it at any time in the enclosing scope</p>
+					</section>
+
+					<section>
+						<br>
+						<p>Functional example:</p>
+						<p><pre><code class="cpp" data-trim contenteditable>
+void Foo::myFunction(const std::vector&lt;int>& myVec)
+{
+    /* ... */
+    std::function&lt;void(int)> myPrint = [](int val) -> void 
+    { std::cout << "Printed value: " << val; };
+    /* ... */
+    for (auto e : myVec) myPrint(e);
+}
+						</code></pre></p>
+					</section>					
+
+					<section>
+						<br>
+						<p>Declare and invoke immediately</p>
+						<br>
+						<p>Lambdas can be declared and invoked directly in-place, after their declaration as:</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+// Declaration and immediate usage:
+[](int val) -> void { 
+    std::cout << "Printed value: " << val; 
+}(42); // "Printed value: 42"
+						</code></pre></p>
+					</section>
+
+					<section>
+						<br>
+						<p>Embrace more complex <i>const correctness</i></p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+bool something = ...
+const int myVal;
+if (something) 
+{
+    myVal = 42;
+} 
+else 
+{
+    myVal = 0;
+}
+// This will not compile since myVal is
+// declared const but not initialized
+						</code></pre></p>
+					</section>
+
+					<section>
+						<br>
+						<p>When the ternary operator (condition ? a : b) is not enough, lambdas are helpful:</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+bool something = ...
+const int myVal = [something]() -> int 
+{
+    if (something) { return 42; } 
+    return 0;
+}();
+						</code></pre></p>
+						<small>The if-else logic is embedded in a lambda immediately invoked after its declaration.	
+							This allows to set the const int according to the desired condition.</small>
+					</section>
+
+				</section>
+
+				<!-- auto -->
+				<section>	
+					<h3><i>auto</i> keyword</h3>
+					<section>
+						<br>
+						<p><i>auto</i> ensures that the type of the variable that is being declared 
+							will be automatically deduced from its initializer.</p>
+						<p><i>auto</i> takes exactly the type on the right-hand side removing const/volatile and &/&&.</p>
+						<p><pre><code class="cpp" data-trim contenteditable>
+auto  foo1 = new Foo();
+auto* foo2 = new Foo(); // equivalent, * is kept
+
+auto  bar1 = getBar();
+auto& bar2 = getBar(); // different, & is removed
+						</code></pre></p>
+					</section>
+					
+					<section>
+						<br>
+						<p>Can't forget variable initialization</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+Foo foo; // OK, but foo might not be initialized
+auto bar; // Does not compile because initialization is missing
+
+auto bar = Bar{ }; // OK, bar is initialized
+						</code></pre></p>
+					</section>
+
+					<section>
+						<br>
+						<p>Guarantees that no implicit conversions occur (including narrowing conversions)</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+int val = 42.f; 
+// OK, but float to int narrowing conversion kicks in
+// Is that desired or is it a bug? 
+// If it is really desired why is it done like that?
+
+auto val = 42.f; // OK
+						</code></pre></p>	
+					</section>
+						
+					<section>
+						<br>
+						<p>Avoid unnecessary temporary conversions</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+std::string getValue() { return "42"; } 
+// const char* to std::string conversion (1)
+
+MyString val = getValue(); 
+// std::string to MyString conversion (2)
+
+auto val = getValue(); // OK
+						</code></pre></p>
+						<small>Note that a temporary can be created during the assignment 
+							if implicit conversion is disabled. In the first case we can have two conversions</small>
+						<small>Using auto two conversions are saved</small>
+					</section>
+
+					<section>
+						<br>
+						<p>Keeps on using the correct type even if initialization is modified</p>
+						<p>Suppose that the previous getValue() function is changed as:</p>
+						<p><pre><code class="cpp" data-trim contenteditable>
+// std::string getValue() { return "42"; } // previous
+int getValue() { return 42; } // new
+std::string val = getValue(); // usage is unchanged
+// Does not compile anymore after 
+// getValue() signature has changed
+
+auto val = getValue(); // OK
+// Keeps on working without changing client code
+						</code></pre></p>
+						<small>Changing a function signature may result in non compilable code</small>
+					</section>
+					
+					<section>
+						<br>
+						<p>Hard to catch narrowing conversion</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+std::vector&lt;int> myVec { /* ... */ };
+for (int i = 0; i &lt; myVec.size(); ++i){ /* ... */ }
+// OK, but can easily overflow. Why?
+
+// std::vector::size() returns size_t (can be 4 bytes), 
+// not an int (can be 2 bytes)
+
+for (auto i = 0; i &lt; myVec.size(); ++i){ /* ... */ } // OK
+						</code></pre></p>	
+					</section>
+					
+					<section>
+						<br>
+						<p>More on narrowing conversion <br>(unexpected side effects)</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+std::vector&lt;float> myVec { 1.0, 2.0, 3.0 };
+
+auto sumA = std::accumulate(myVec.begin(), myVec.end(), 0.0); 
+// OK, sumA is float as expected.
+
+auto sumB = std::accumulate(myVec.begin(), myVec.end(), 0);  
+// OK, BUT sumB is int because the type of "0" 
+// in std::accumulate is set as the return type
+						</code></pre></p>	
+					</section>
+					
+					<section>
+						<br>
+						<p>Smart pointers "Heap-like" initialization</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+std::unique_ptr&lt;Bar> b 
+	= std::unique_ptr&lt;Bar>(new Bar()); // OK   
+	
+auto f = make_unique&lt;Foo>(); // OK, better
+						</code></pre></p>	
+					</section>
+
+					<section>
+						<br>
+						<p>Use of literal suffixes for uniform initialization</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+int x = 42;                       auto x = 42;
+float x = 42.;                    auto x = 42.f;
+unsigned long x = 42;             auto x = 42ul;
+
+using namespace std::string_literals; // C++14
+std::string x = "42";             auto x = "42"s;   
+
+using namespace std::chrono_literals; // C++14
+std::chrono::nanoseconds x{ 42 }; auto x = 42ns;    
+						</code></pre></p>	
+					</section>
+
+					<section>
+						<br>
+						<p>Template function with trailing return type</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+template &lt;class T, class U>
+auto getValue(const T& t, const U& u) -> decltype(T + U){
+    return t + u;
+}
+						</code></pre></p>	
+						<small>Provides great flexibility for generic templated code</small>
+					</section>
+
+					<section>
+						<p>Member function with trailing return type</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+class Foo {
+    /* ... */
+    std::map&lt;const std::string, std::shared_ptr&lt;Bar>> mFooMap;
+}
+
+auto Foo::func(const std::string& id)
+ -> decltype(mFooMap)::iterator 
+{
+    return std::find_if(mFooMap.begin(), mFooMap.end(),
+        [id](const auto& pair) {return id == pair.first.name; });
+}
+						</code></pre></p>	
+						<small>If mFooMap is changed, Foo::func() and all its usages don't require any changes</small>
+					</section>
+
+					<section>
+						<br>
+						<p>And finally, less typing for the lazy ones</p>
+						<br>
+						<p><pre><code class="cpp" data-trim contenteditable>
+std::map&lt;Foo::Bar, std::vector&lt;T>>::const_iterator it 
+    = myMap.begin(); // OK
+	
+auto it = myMap.begin(); // OK, lazy
+						</code></pre></p>	
+					</section>
+					
+				</section>
+
 				<!-- Thank you! -->
 				<section>	
 					<h3>Thank you!</h3>
@@ -38,8 +609,6 @@
 				<!-- Questions? -->
 				<section>	
 					<h3>Questions?</h3>
-				</section>	
-				
 				</section>
 			</div>
 		</div>
