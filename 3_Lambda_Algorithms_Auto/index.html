@@ -251,13 +251,13 @@ int sumPar = std::reduce(
 						<p>Capture Group</p>
 						<p>
 							<ul>
-								<li>[ ]: empty capture list
+								<li>[ ]: <span id="c1">empty</span> capture list
 									<br><small>No local variables from the enclosing scope can be used in the lambda body</small></li>
-								<li>[&]: capture by reference
+								<li>[&]: capture by <span id="c1">reference</span>
 									<br><small>All local variables from the enclosing scope are accessed by reference</small></li>
-								<li>[=]: capture by value
+								<li>[=]: capture by <span id="c1">value</span>
 									<br><small>All local variables from the enclosing scope are accessed by copy</small></li>
-								<li>[capture-list]: capture only specified variables
+								<li>[capture-list]: capture only <span id="c1">specified variables</span>
 									<br><small>Any combination of the previous is possible</small></li>
 							</ul>
 						</p>
