@@ -23,6 +23,265 @@
 					</p>
 				</section>				
 				
+				<!-- Agenda -->
+				<section>
+					<h3 id="c1">Agenda</h3>
+					<br>
+					<p><ul>						
+						<li>Filesystem: <i>file</i> and <i>path</i></li>						
+						<li>Utilities: <i>optional</i>, <i>variant</i> and <i>any</i></li>						
+						<li>New language features</li>
+					</ul></p>
+				</section>
+
+				<!-- Filesystem -->
+				<section>	
+					<h3>Filesystem</h3>
+					<br>	
+					<section>
+						<br>	
+						<p>The filesystem library allows to perform operations on file systmem components.</p>
+						<br>	
+						<p>Filesystem is based on the three elements:
+							<p><ul>						
+								<li><span id="c1">file</span></li>
+								<li><span id="c1">file name</span></li>
+								<li><span id="c1">path</span></li>
+							</ul></p>
+						</p>
+						<br>
+						<small>See the full reference <a href="https://en.cppreference.com/w/cpp/filesystem" id="c1">here</a></small>	
+					</section>
+					
+<section>
+	<p>Simple filesystem examples</p>
+		<br>
+		<p><pre><code class="cpp" data-trim contenteditable>
+namespace fs = std::filesystem;
+		</code></pre></p>
+
+		<br>
+		<p>
+			Retrieve current path
+		</p>
+		<p><pre><code class="cpp" data-trim contenteditable>
+fs::current_path()
+		</code></pre></p>
+
+</section>
+
+<section>
+		<br>
+		<p>
+			Create/Delete nested directories	
+		</p>
+		<p><pre><code class="cpp" data-trim contenteditable>
+std::string myDir = "root/first/second";
+fs::create_directories(myDir);
+fs::remove_all("root");
+		</code></pre></p>
+
+		<br>
+		<p>
+			Basic file information
+		</p>
+		<p><pre><code class="cpp" data-trim contenteditable>
+fs::exists(myDir)
+fs::is_directory(myDir)
+fs::is_symlink(myDir)
+		</code></pre></p>	
+</section>
+
+<section>
+	<br>
+	<p>
+		Permissions
+		<br>
+		<small>The class fs::perms can hold values such as: owner_read, owner_write, group_read, group_write, ... </small>
+		<br>
+		<small>fs::perms is a bitmask type, so you can read its value as: </small>
+	</p>	
+	<p><pre><code class="cpp" data-trim contenteditable>
+fs::perms myPerms = fs::status("myFile.txt").permissions();
+bool canOwnerRead = 
+    (perm & fs::perms::owner_read) != fs::perms::none;
+	</code></pre></p>
+</section>
+
+<section>
+	<br>
+	<p>
+		Read/Write times	
+	</p>
+	<p><pre><code class="cpp" data-trim contenteditable>
+fs::path myPath = fs::current_path() / "myFile.txt";
+std::ofstream(path.c_str()); 
+auto writeTime = fs::last_write_time(path);
+	</code></pre></p>
+</section>
+
+<section>
+	<br>
+	<p>
+		Space information (capacity, free, and available):	
+	</p>
+	<p><pre><code class="cpp" data-trim contenteditable>
+fs::space_info root_info = fs::space("/");
+std::cout &lt; root_info.capacity;
+std::cout &lt; root_info.free;
+std::cout &lt; root_info.available;
+	</code></pre></p>
+</section>
+
+				</section>
+
+				<section>	
+					<h3>Utilities</h3>
+					<br>
+					<section>
+						<br>	
+						<p>std::optional</p>
+						<br>	
+						<p>It is a template class that can wrap any type allows to indicate 
+							if the value is initialized or not</p>
+						<br>	
+						<p>Typical usage is to handle function that may fail (return prematurely)
+							without returning a value. 
+						</p>
+						<br>
+						<small></small>	
+					</section>
+
+					<section>
+						<br>	
+						<p>Check if there is a valid value</p>
+						<br>	
+						<p>Conversion to bool or using .value() / .value_or()</p>
+						<br>	
+						<p> </p>
+						<br>
+						<small></small>	
+					</section>
+
+					<section>
+						<br>	
+						<p>std::variant</p>
+						<br>	
+						<p>Template class that enforce a type-safe union.</p>
+						<br>
+						<p>Can hold a value of one of its alternative types, or none</p>
+						<br>	
+						<p>Now you can forget about old (and unsafe) unions</p>
+						<br>
+						<small></small>	
+					</section>
+
+					<section>
+						<br>	
+						<p></p>
+						<br>	
+						<p> </p>
+						<br>	
+						<p> </p>
+						<br>
+						<small></small>	
+					</section>
+
+					<section>
+						<br>	
+						<p>std::any</p>
+						<br>	
+						<p> </p>
+						<br>	
+						<p> </p>
+						<br>
+						<small></small>	
+					</section>
+
+					<section>
+						<br>	
+						<p></p>
+						<br>	
+						<p> </p>
+						<br>	
+						<p> </p>
+						<br>
+						<small></small>	
+					</section>
+
+				</section>
+
+				<section>	
+					<h3>New language features:</h3>
+					<br>
+					<section>
+						<br>	
+						<p>Structured Bindings</p>
+						<br>	
+						<p>Can be initialized from a tuple or from a struct</p>
+						<br>	
+						<p>Pre C++17: std::tie, std::ignore</p>
+						<br>
+						<small></small>	
+					</section>
+
+					<section>
+						<br>	
+						<p>Multi-Value return</p>
+						<br>	
+						<p>N-Value tuple that can be unpacked using Structured Bindings</p>
+						<br>	
+						<p>No more need to pass input reference to functions</p>
+						<br>
+						<small></small>	
+					</section>
+
+					<section>
+						<br>	
+						<p>if/switch initialization statement</p>
+						<br>	
+						<p> example of the "canonical" initializaztion with a for loop</p>
+						<br>	
+						<p> </p>
+						<br>
+						<small></small>	
+					</section>
+
+					<section>
+						<br>	
+						<p>if</p>
+						<br>	
+						<p> </p>
+						<br>	
+						<p>switch</p>
+						<br>
+						<small></small>	
+					</section>
+
+					<section>
+						<br>	
+						<p>if constexpr</p>
+						<br>	
+						<p> </p>
+						<br>	
+						<p></p>
+						<br>
+						<small></small>	
+					</section>
+
+					<section>
+						<br>	
+						<p>fold expressions</p>
+						<br>	
+						<p> </p>
+						<br>	
+						<p> </p>
+						<br>
+						<small></small>	
+					</section>
+
+				</section>
+
 				<!-- Thank you! -->
 				<section>	
 					<h3>Thank you!</h3>
