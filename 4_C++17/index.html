@@ -140,51 +140,78 @@ std::cout &lt; root_info.available;
 					<br>
 					<section>
 						<br>	
-						<p>std::optional</p>
+						<p>std::optional&lt;T></p>
+						<p>It is a template class that can wrap any type T and it is able to indicate 
+							if the wrapped value is initialized or not.</p>						
+<p><pre><code class="cpp" data-trim contenteditable>
+std::optional&lt;int> opt1 = std::make_optional&lt;int>(42);
+std::optional&lt;int> opt2 { 42 }; // Implicit initialization
+</code></pre></p>
+						<br>
+						<small>Typical usage is to handle function that may fail (return prematurely)
+							without returning a value.
+						</small>
+					</section>
+
+					<section>
 						<br>	
-						<p>It is a template class that can wrap any type allows to indicate 
-							if the value is initialized or not</p>
-						<br>	
-						<p>Typical usage is to handle function that may fail (return prematurely)
-							without returning a value. 
-						</p>
+						<p>Example: check if a function returns a valid value</p>
+						<br>
+<p><pre><code class="cpp" data-trim contenteditable>
+std::optional&lt;std::string> getString(bool ok) {
+    if (ok) { return "OptionalString"; }
+    return { }; // create an empty std::optional&lt;std::string>
+}
+
+auto str1 = getString(true);
+std::cout &lt;&lt; str1.value(); // "OptionalString"
+
+auto str2 = getString(false);
+std::cout &lt;&lt; str2.value(); // throws std::bad_optional_access 
+std::cout &lt;&lt; str2.value_or("NoString"); // "NoString"
+
+if (str2.has_value()) { /*...*/ } // explicit safety check
+if (str2) { /*...*/ } // (bool conversion) implicit safety check
+</code></pre></p>
 						<br>
 						<small></small>	
 					</section>
 
 					<section>
 						<br>	
-						<p>Check if there is a valid value</p>
-						<br>	
-						<p>Conversion to bool or using .value() / .value_or()</p>
-						<br>	
-						<p> </p>
-						<br>
-						<small></small>	
+						<p>std::variant&lt;T></p>
+						<p>Template class that enforces a type-safe union. 
+							<br>It can hold a value of one of its alternative types, or none</p>
+<p><pre><code class="cpp" data-trim contenteditable>
+std::variant&lt;int, std::string> var = 42;
+std::cout &lt;&lt; std::get&lt;int>(var); // "42"
+
+var = "myString"s;
+std::cout &lt;&lt; std::get&lt;std::string>(var); //"myString"
+
+int x = std::get&lt;int>(var); // throws std::bad_variant_access
+</code></pre></p>
+						<small>Now you can forget about old (and unsafe) unions</small>		
+						<small>Note that it is now possible to implement easily a visitor pattern using std::visit</small>	
 					</section>
 
-					<section>
-						<br>	
-						<p>std::variant</p>
-						<br>	
-						<p>Template class that enforce a type-safe union.</p>
-						<br>
-						<p>Can hold a value of one of its alternative types, or none</p>
-						<br>	
-						<p>Now you can forget about old (and unsafe) unions</p>
-						<br>
-						<small></small>	
-					</section>
+					<section>	
+						<p>Example: check the current type</p>
+<p><pre><code class="cpp" data-trim contenteditable>
+std::variant&lt;int, std::string> var { "myString"; }
+std::cout &lt;&lt; std::holds_alternative&lt;int>(var); // false
+std::cout &lt;&lt; std::holds_alternative&lt;std::string>(var); // true
+</code></pre></p>
+<br>
+<p>Example: try to get the current value</p>
+<p><pre><code class="cpp" data-trim contenteditable>
+std::variant&lt;int, float> var { 42 };
+if(auto pvar = std::get_if&lt;int>(&var))
+    std::cout &lt;&lt; "variant value: " << *pvar; // "42"
+else 
+    std::cout &lt;&lt; "failed to get value!";
+</code></pre></p>
 
-					<section>
-						<br>	
-						<p></p>
-						<br>	
-						<p> </p>
-						<br>	
-						<p> </p>
-						<br>
-						<small></small>	
 					</section>
 
 					<section>
