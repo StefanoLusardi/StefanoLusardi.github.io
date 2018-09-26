@@ -196,7 +196,7 @@ int x = std::get&lt;int>(var); // throws std::bad_variant_access
 					</section>
 
 					<section>	
-						<p>Example: check the current type</p>
+						<p>Example: check current type</p>
 <p><pre><code class="cpp" data-trim contenteditable>
 std::variant&lt;int, std::string> var { "myString"; }
 std::cout &lt;&lt; std::holds_alternative&lt;int>(var); // false
@@ -207,7 +207,7 @@ std::cout &lt;&lt; std::holds_alternative&lt;std::string>(var); // true
 <p><pre><code class="cpp" data-trim contenteditable>
 std::variant&lt;int, float> var { 42 };
 if(auto pvar = std::get_if&lt;int>(&var))
-    std::cout &lt;&lt; "variant value: " << *pvar; // "42"
+    std::cout &lt;&lt; "variant value: " &lt;&lt; *pvar; // "42"
 else 
     std::cout &lt;&lt; "failed to get value!";
 </code></pre></p>
@@ -218,22 +218,36 @@ else
 						<br>	
 						<p>std::any</p>
 						<br>	
-						<p> </p>
-						<br>	
-						<p> </p>
+						<p>Class template that can wrap a value of any type in a type-safe way.</p>
 						<br>
-						<small></small>	
+<p><pre><code class="cpp" data-trim contenteditable>
+std::any a(42); // initialize with an int
+a = std::string("MyString"); // store a std::string
+
+std::cout &lt;&lt; std::any_cast&lt;std::string>(a); // "MyString"
+std::cout &lt;&lt; std::any_cast&lt;int>(a); // throws std::bad_any_cast
+</code></pre></p>
+						<small>Before C++17 it was possible to achieve a similar behavior 
+							using <i>void*</i> but this is not type-safe (dangerous!)</small>	
 					</section>
 
 					<section>
 						<br>	
-						<p></p>
-						<br>	
-						<p> </p>
-						<br>	
-						<p> </p>
-						<br>
-						<small></small>	
+						<p>Example: check current type</p>
+<p><pre><code class="cpp" data-trim contenteditable>
+std::any = 42;
+
+if (a.has_value())
+    std::cout &lt;&lt; a.type().name(); // "i" (int)
+else
+    a.reset(); // destroy wrapped object
+
+	
+if (a.type() == typeid(int))
+    std::cout &lt;&lt; "int: " &lt;&lt; std::any_cast&lt;int>(a);
+else if (a.type() == typeid(std::string))
+    std::cout &lt;&lt; "string: " &lt;&lt; std::any_cast&lt;std::string>(a);
+</code></pre></p>
 					</section>
 
 				</section>
@@ -241,15 +255,67 @@ else
 				<section>	
 					<h3>New language features:</h3>
 					<br>
+
+					<section>
+						<br>	
+						<p>if/switch initialization statement</p>
+						<p>It has always been possible to initialize a variable directly in a for loop as:</p>
+<p><pre><code class="cpp" data-trim contenteditable>
+for (int i = 0; i &lt; SIZE; ++i) { /*...*/ }
+</code></pre></p>
+						<p>This is very convenient and safe: it prevents that the <i>i</i> 
+							variable is used outside the loop scope.
+						</p>	
+						<br>
+						<p>Now it is possible to do the same with both <i>if</i>
+							and <i>switch</i> statements.</p>
+					</section>
+
+					<section>
+							<br>	
+							<p>Example: in-scope if initialization</p>
+<p><pre><code class="cpp" data-trim contenteditable>
+if (const auto key = getKey(); key!=42) { /* use key */ }
+else { /* use key */ }
+// key is no longer defined here
+
+std::map&lt;int, std::string> myMap {{0, "z"}, {42, "f"}};
+if (const auto it = myMap.find(42); it != myMap.end())
+    std::cout &lt;&lt; it->second; // "f"
+</code></pre></p>	
+							<br>
+							<p>The variable declared in the if (or switch) statement
+								can only be used in the if or else branch since 
+								it not visible to the outer scope.
+							</p>
+							<small></small>	
+						</section>
+
 					<section>
 						<br>	
 						<p>Structured Bindings</p>
 						<br>	
 						<p>Can be initialized from a tuple or from a struct</p>
 						<br>	
+
 						<p>Pre C++17: std::tie, std::ignore</p>
+
 						<br>
-						<small></small>	
+
+						<p>Example: get values from a struct</p>
+<p><pre><code class="cpp" data-trim contenteditable>
+</code></pre></p>
+
+						<p>Example: set values to a struct</p>
+<p><pre><code class="cpp" data-trim contenteditable>
+</code></pre></p>
+
+<p><pre><code class="cpp" data-trim contenteditable>
+if (auto [iter, inserted] = mySet.insert(value); inserted)
+{ /* value has been inserted at position "iter" */ }
+else 
+{ /* value has not been inserted */ }
+</code></pre></p>
 					</section>
 
 					<section>
@@ -259,28 +325,6 @@ else
 						<p>N-Value tuple that can be unpacked using Structured Bindings</p>
 						<br>	
 						<p>No more need to pass input reference to functions</p>
-						<br>
-						<small></small>	
-					</section>
-
-					<section>
-						<br>	
-						<p>if/switch initialization statement</p>
-						<br>	
-						<p> example of the "canonical" initializaztion with a for loop</p>
-						<br>	
-						<p> </p>
-						<br>
-						<small></small>	
-					</section>
-
-					<section>
-						<br>	
-						<p>if</p>
-						<br>	
-						<p> </p>
-						<br>	
-						<p>switch</p>
 						<br>
 						<small></small>	
 					</section>
