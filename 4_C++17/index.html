@@ -57,15 +57,18 @@
 	<p>Simple filesystem examples</p>
 		<br>
 		<p><pre><code class="cpp" data-trim contenteditable>
+#include &lt;filesystem>
 namespace fs = std::filesystem;
 		</code></pre></p>
 
 		<br>
 		<p>
-			Retrieve current path
+			Retrieve paths
 		</p>
 		<p><pre><code class="cpp" data-trim contenteditable>
-fs::current_path()
+fs::path path1 = fs::current_path();
+fs::path path2 = "/path/to/myFile.cf";
+fs::path path3 = "C:\\path\\to\\my\\Folder\\"; 
 		</code></pre></p>
 
 </section>
@@ -77,8 +80,8 @@ fs::current_path()
 		</p>
 		<p><pre><code class="cpp" data-trim contenteditable>
 std::string myDir = "root/first/second";
-fs::create_directories(myDir);
-fs::remove_all("root");
+bool isCreated = fs::create_directories(myDir);
+auto numDeletedFolders = fs::remove_all("root"); // recursive
 		</code></pre></p>
 
 		<br>
@@ -86,9 +89,9 @@ fs::remove_all("root");
 			Basic file information
 		</p>
 		<p><pre><code class="cpp" data-trim contenteditable>
-fs::exists(myDir)
-fs::is_directory(myDir)
-fs::is_symlink(myDir)
+bool a = fs::exists(myDir)
+bool b = fs::is_directory(myDir)
+bool c = fs::is_symlink(myDir)
 		</code></pre></p>	
 </section>
 
@@ -127,9 +130,9 @@ auto writeTime = fs::last_write_time(path);
 	</p>
 	<p><pre><code class="cpp" data-trim contenteditable>
 fs::space_info root_info = fs::space("/");
-std::cout &lt; root_info.capacity;
-std::cout &lt; root_info.free;
-std::cout &lt; root_info.available;
+std::cout &lt;&lt; root_info.capacity;
+std::cout &lt;&lt; root_info.free;
+std::cout &lt;&lt; root_info.available;
 	</code></pre></p>
 </section>
 
@@ -140,7 +143,7 @@ std::cout &lt; root_info.available;
 					<br>
 					<section>
 						<br>	
-						<p>std::optional&lt;T></p>
+						<p><span id="c1">std::optional&lt;T></span></p>
 						<p>It is a template class that can wrap any type T and it is able to indicate 
 							if the wrapped value is initialized or not.</p>						
 <p><pre><code class="cpp" data-trim contenteditable>
@@ -179,7 +182,7 @@ if (str2) { /*...*/ } // (bool conversion) implicit safety check
 
 					<section>
 						<br>	
-						<p>std::variant&lt;T></p>
+						<p><span id="c1">std::variant&lt;T></span></p>
 						<p>Template class that enforces a type-safe union. 
 							<br>It can hold a value of one of its alternative types, or none</p>
 <p><pre><code class="cpp" data-trim contenteditable>
@@ -216,7 +219,7 @@ else
 
 					<section>
 						<br>	
-						<p>std::any</p>
+						<p><span id="c1">std::any</span></p>
 						<br>	
 						<p>Class template that can wrap a value of any type in a type-safe way.</p>
 						<br>
@@ -258,7 +261,7 @@ else if (a.type() == typeid(std::string))
 
 					<section>
 						<br>	
-						<p>if/switch initialization statement</p>
+						<p><span id="c1">if/switch initialization statement</span></p>
 						<p>It has always been possible to initialize a variable directly in a for loop as:</p>
 <p><pre><code class="cpp" data-trim contenteditable>
 for (int i = 0; i &lt; SIZE; ++i) { /*...*/ }
@@ -293,60 +296,60 @@ if (const auto it = myMap.find(42); it != myMap.end())
 
 					<section>
 						<br>	
-						<p>Structured Bindings</p>
+						<p><span id="c1">Structured Bindings</span></p>
 						<br>	
 						<p>Can be initialized from a tuple or from a struct</p>
 						<br>	
 
 						<p>Pre C++17: std::tie, std::ignore</p>
+					</section>
 
-						<br>
-
-						<p>Example: get values from a struct</p>
+					<section>
+					<br>
+					<p>Example: get values from a struct</p>
 <p><pre><code class="cpp" data-trim contenteditable>
+struct Point2D { int x; int y; };
+auto p = Point2D(1, 2);
+
+const auto& [lat, lon] = p;
+std::cout &lt;&lt; lat; // 1
+std::cout &lt;&lt; lon; // 2
 </code></pre></p>
-
-						<p>Example: set values to a struct</p>
+						</section>
+						<section>
+						<p>Example: iterate on a map</p>
 <p><pre><code class="cpp" data-trim contenteditable>
+std::map&lt;int, char> myMap {{1, 'a'}, {2, 'b'}};    
+for (const auto& [key, val] : myMap) 
+{  
+    std::cout &lt;&lt; key &lt;&lt; val; 
+} 
+// 1'a'
+// 2'b'
 </code></pre></p>
-
+						</section>
+						<section>
+						<p>Example: combine with if-init</p>
 <p><pre><code class="cpp" data-trim contenteditable>
-if (auto [iter, inserted] = mySet.insert(value); inserted)
-{ /* value has been inserted at position "iter" */ }
+if (auto [iter, isInserted] = mySet.insert(value); isInserted)
+{ 
+	/* value has been inserted at position "iter" */ 
+}
 else 
-{ /* value has not been inserted */ }
+{ 
+	/* value has not been inserted */ 
+}
+// iter and isInserted are out of scope here
 </code></pre></p>
 					</section>
 
 					<section>
 						<br>	
-						<p>Multi-Value return</p>
+						<p><span id="c1">Multi-Value return</span></p>
 						<br>	
 						<p>N-Value tuple that can be unpacked using Structured Bindings</p>
 						<br>	
 						<p>No more need to pass input reference to functions</p>
-						<br>
-						<small></small>	
-					</section>
-
-					<section>
-						<br>	
-						<p>if constexpr</p>
-						<br>	
-						<p> </p>
-						<br>	
-						<p></p>
-						<br>
-						<small></small>	
-					</section>
-
-					<section>
-						<br>	
-						<p>fold expressions</p>
-						<br>	
-						<p> </p>
-						<br>	
-						<p> </p>
 						<br>
 						<small></small>	
 					</section>
