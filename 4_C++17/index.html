@@ -138,6 +138,7 @@ std::cout &lt;&lt; root_info.available;
 
 				</section>
 
+				<!-- Utilities -->
 				<section>	
 					<h3>Utilities</h3>
 					<br>
@@ -255,8 +256,9 @@ else if (a.type() == typeid(std::string))
 
 				</section>
 
+				<!-- New language features -->
 				<section>	
-					<h3>New language features:</h3>
+					<h3>New language features</h3>
 					<br>
 
 					<section>
@@ -280,8 +282,10 @@ for (int i = 0; i &lt; SIZE; ++i) { /*...*/ }
 <p><pre><code class="cpp" data-trim contenteditable>
 if (const auto key = getKey(); key!=42) { /* use key */ }
 else { /* use key */ }
-// key is no longer defined here
+// "key" is no longer defined here
+</code></pre></p>	
 
+<p><pre><code class="cpp" data-trim contenteditable>
 std::map&lt;int, std::string> myMap {{0, "z"}, {42, "f"}};
 if (const auto it = myMap.find(42); it != myMap.end())
     std::cout &lt;&lt; it->second; // "f"
@@ -289,7 +293,7 @@ if (const auto it = myMap.find(42); it != myMap.end())
 							<br>
 							<p>The variable declared in the if (or switch) statement
 								can only be used in the if or else branch since 
-								it not visible to the outer scope.
+								it is not visible to the outer scope.
 							</p>
 							<small></small>	
 						</section>
@@ -298,10 +302,39 @@ if (const auto it = myMap.find(42); it != myMap.end())
 						<br>	
 						<p><span id="c1">Structured Bindings</span></p>
 						<br>	
-						<p>Can be initialized from a tuple or from a struct</p>
+						<p>Create a set of <i>"alias names"</i> from a tuple or from a struct</p>
 						<br>	
+					</section>
+					
+					<section>
+					<br>
+						<p>Example: C++11 binding with std::tie</p>
+<p><pre><code class="cpp" data-trim contenteditable>
+std::set&lt;int> mySet { };
+std::set&lt;int>::iterator iter;
+bool isInserted; 
 
-						<p>Pre C++17: std::tie, std::ignore</p>
+// can't be declared const
+// can't be reference types
+
+std::tie(iter, isInserted) = mySet.insert(42);
+std::cout &lt;&lt; isInserted; // "true"
+
+std::tie(std::ignore, isInserted) = mySet.insert(42);
+std::cout &lt;&lt; isInserted; // "false"
+</code></pre></p>
+					</section>
+
+					<section>
+						<br>
+						<p>Example: C++17 Structured Bindings</p>
+<p><pre><code class="cpp" data-trim contenteditable>
+std::set&lt;int> mySet { };
+const auto& [iter, isInserted] = mySet.insert(42);
+
+// Now "isInserted" can be const
+// "iter" and "isInserted" can be reference types
+</code></pre></p>
 					</section>
 
 					<section>
@@ -339,7 +372,7 @@ else
 { 
 	/* value has not been inserted */ 
 }
-// iter and isInserted are out of scope here
+// "iter" and "isInserted" are out of scope here
 </code></pre></p>
 					</section>
 
@@ -347,13 +380,30 @@ else
 						<br>	
 						<p><span id="c1">Multi-Value return</span></p>
 						<br>	
-						<p>N-Value tuple that can be unpacked using Structured Bindings</p>
+						<p>Function returning tuple that can be unpacked using Structured Bindings</p>
 						<br>	
-						<p>No more need to pass input reference to functions</p>
+						<p>No more need to pass input reference to functions to retrieve multiple outputs</p>
 						<br>
-						<small></small>	
 					</section>
 
+					<section>
+						<p>Example: tuple-return</p>
+<p><pre><code class="cpp" data-trim contenteditable>
+std::tuple&lt;int, std::string, float> func(){
+	/* ... */
+	return { 42, "myString", 1.234}
+}
+
+const auto& [a, b, c] = func();
+std::cout &lt;&lt; a; // 42
+std::cout &lt;&lt; b; // "myString"
+std::cout &lt;&lt; c; // 1.234 
+</code></pre></p>
+					<p>Example: combine with if-init</p>
+<p><pre><code class="cpp" data-trim contenteditable>
+if (const auto& [a, b, c] = func(); a>41)
+{ /* ... */ }
+</code></pre></p>
 				</section>
 
 				<!-- Thank you! -->
