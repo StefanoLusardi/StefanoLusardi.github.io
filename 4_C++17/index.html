@@ -311,11 +311,14 @@ if (const auto it = myMap.find(42); it != myMap.end())
 						<p>Example: C++11 binding with std::tie</p>
 <p><pre><code class="cpp" data-trim contenteditable>
 std::set&lt;int> mySet { };
+
+// can't be declared const nor reference types
 std::set&lt;int>::iterator iter;
 bool isInserted; 
 
-// can't be declared const
-// can't be reference types
+std::pair&lt;std::set&lt;int>::iterator, bool> it = mySet.insert(0)
+iter = it.first;
+isInserted = it.second;
 
 std::tie(iter, isInserted) = mySet.insert(42);
 std::cout &lt;&lt; isInserted; // "true"
@@ -366,11 +369,11 @@ for (const auto& [key, val] : myMap)
 <p><pre><code class="cpp" data-trim contenteditable>
 if (auto [iter, isInserted] = mySet.insert(value); isInserted)
 { 
-	/* value has been inserted at position "iter" */ 
+    /* value has been inserted at position "iter" */ 
 }
 else 
 { 
-	/* value has not been inserted */ 
+    /* value has not been inserted */ 
 }
 // "iter" and "isInserted" are out of scope here
 </code></pre></p>
